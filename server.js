@@ -6,10 +6,11 @@ app.use(express.json());
 app.use(express.static("public"));
 
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
+const PAYMENTS_WEBHOOK_URL = process.env.PAYMENTS_WEBHOOK_URL;
 
 app.post("/send", async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, channel } = req.body;
 
         if (!message || !message.trim()) {
             return res.status(400).json({
@@ -18,14 +19,22 @@ app.post("/send", async (req, res) => {
             });
         }
 
-        if (!WEBHOOK_URL) {
+        let webhookUrl;
+
+        if (channel === "payments") {
+            webhookUrl = PAYMENTS_WEBHOOK_URL;
+        } else {
+            webhookUrl = WEBHOOK_URL;
+        }
+
+        if (!webhookUrl) {
             return res.status(500).json({
                 success: false,
-                error: "Webhook URL is not configured."
+                error: "Webhook for this channel is not configured."
             });
         }
 
-        const response = await fetch(WEBHOOK_URL, {
+        const response = await fetch(webhookUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
