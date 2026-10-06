@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FAHNG Webhook</title>
+</head>
+
+<body>
+    <h1>FAHNG Webhook</h1>
+
+    <textarea
+        id="message"
+        placeholder="Type your Discord message..."
+        rows="12"
+        cols="60"
+    ></textarea>
+
+    <br><br>
+
+    <button onclick="sendMessage()">Send Message</button>
+
+    <p id="status"></p>
+
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById("message").value;
+            const status = document.getElementById("status");
+
+            status.textContent = "Sending...";
+
+            const response = await fetch("/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+
+            status.textContent = data.success
+                ? "Message sent!"
+                : data.error;
+        }
+    </script>
+</body>
+</html>
