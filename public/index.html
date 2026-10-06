@@ -1,46 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>FAHNG Webhook</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                radial-gradient(circle at top left, #ffd9ec 0%, transparent 35%),
+                radial-gradient(circle at bottom right, #dfd1ff 0%, transparent 35%),
+                #fff5fb;
+
+            color: #5b4963;
+        }
+
+        .container {
+            width: 520px;
+            max-width: 92%;
+            padding: 32px;
+
+            background: rgba(255, 255, 255, 0.82);
+            border: 1px solid rgba(255, 190, 220, 0.7);
+            border-radius: 24px;
+
+            box-shadow:
+                0 20px 50px rgba(150, 100, 150, 0.15),
+                0 4px 15px rgba(255, 160, 205, 0.12);
+
+            backdrop-filter: blur(12px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+            color: #9b6fa9;
+        }
+
+        .header p {
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 13px;
+            color: #b18bbd;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #80628a;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        select,
+        textarea {
+            width: 100%;
+
+            border: 1px solid #e7c8e7;
+            border-radius: 14px;
+
+            background: #fffaff;
+            color: #66506e;
+
+            outline: none;
+
+            transition: 0.2s ease;
+        }
+
+        select {
+            height: 48px;
+            padding: 0 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        textarea {
+            min-height: 250px;
+            padding: 15px;
+
+            resize: vertical;
+
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        select:focus,
+        textarea:focus {
+            border-color: #c79bd3;
+
+            box-shadow:
+                0 0 0 3px rgba(199, 155, 211, 0.15);
+        }
+
+        button {
+            width: 100%;
+            height: 48px;
+
+            border: none;
+            border-radius: 14px;
+
+            background: linear-gradient(
+                135deg,
+                #d9a8dc,
+                #f1afd0
+            );
+
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 20px rgba(205, 145, 190, 0.25);
+
+            transition: 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 12px 25px rgba(205, 145, 190, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #status {
+            min-height: 20px;
+            margin: 15px 0 0;
+
+            text-align: center;
+            font-size: 13px;
+            color: #a477ad;
+        }
+
+        .channel-info {
+            margin-top: 7px;
+            font-size: 11px;
+            color: #b89bc0;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>FAHNG Webhook</h1>
 
-    <textarea
-        id="message"
-        placeholder="Type your Discord message..."
-        rows="12"
-        cols="60"
-    ></textarea>
+<div class="container">
 
-    <br><br>
+    <div class="header">
+        <h1>FAHNG Webhook</h1>
+        <p>Send messages to your Discord channels</p>
+    </div>
 
-    <button onclick="sendMessage()">Send Message</button>
+    <div class="field">
+        <label for="channel">Send to</label>
+
+        <select id="channel">
+            <option value="default">Main Channel</option>
+            <option value="payments">#・payments</option>
+        </select>
+
+        <div class="channel-info">
+            Choose which connected webhook should receive the message.
+        </div>
+    </div>
+
+    <div class="field">
+        <label for="message">Message</label>
+
+        <textarea id="message">╭───────────────╮
+      𝙇𝙊𝙑𝙀𝘿4𝙀𝙑𝘼
+      ∂α hoo∂ scripts
+╰───────────────╯
+
+700 rbx ︙ main
+
+850 rbx ︙ char
+650 rbx ︙ danffa
+700 rbx ︙ mobile main
+650 rbx ︙ mobile danffa
+
+🗡 𝓨uri's Angels — at your service</textarea>
+    </div>
+
+    <button id="sendButton" onclick="sendMessage()">
+        Send Message
+    </button>
 
     <p id="status"></p>
 
-    <script>
-        async function sendMessage() {
-            const message = document.getElementById("message").value;
-            const status = document.getElementById("status");
+</div>
 
-            status.textContent = "Sending...";
+<script>
+    async function sendMessage() {
+        const message = document.getElementById("message").value;
+        const channel = document.getElementById("channel").value;
+        const button = document.getElementById("sendButton");
+        const status = document.getElementById("status");
 
+        if (!message.trim()) {
+            status.textContent = "Please enter a message.";
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Sending...";
+        status.textContent = "";
+
+        try {
             const response = await fetch("/send", {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ message })
+
+                body: JSON.stringify({
+                    message: message,
+                    channel: channel
+                })
             });
 
             const data = await response.json();
 
-            status.textContent = data.success
-                ? "Message sent!"
-                : data.error;
+            if (data.success) {
+                status.textContent = "Message sent successfully! ♡";
+            } else {
+                status.textContent = data.error || "Something went wrong.";
+            }
+
+        } catch (error) {
+            status.textContent = "Could not connect to the server.";
         }
-    </script>
+
+        button.disabled = false;
+        button.textContent = "Send Message";
+    }
+</script>
+
 </body>
 </html>
